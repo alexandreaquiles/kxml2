@@ -3,16 +3,25 @@
 
 <project name="kxml2" default="build" basedir=".">
 
-  <property name="version" value="2.3.1" />	
-	
+  <property name="version" value="2.5.0" />
+
+  <!-- dirs -->
+  <property name="srcDir" value="src/main/java" />
+  <property name="resourceDir" value="src/main/resources" />
+  <property name="docsDir" value="doc/api" />
+  <property name="tmpDir" value="tmpclasses" />
+
+  <!-- dependencies -->
+  <property name="maven_repo" value="${user.home}/.m2/repository" />
+  <property name="xmlpull" value="${maven_repo}/org/xmlpull/xmlpull/1.1.3.4c-SNAPSHOT/xmlpull-1.1.3.4c-SNAPSHOT" />
   
   <target name="javadoc">
-    <delete dir="doc/api"/>
-    <mkdir dir="doc/api"/>    
-    <javadoc packagenames="org.kxml2.*" classpath="lib/xmlpull_1_1_3_1.jar"
+    <delete dir="${docsDir}"/>
+    <mkdir dir="${docsDir}"/>
+    <javadoc packagenames="org.kxml2.*" classpath="${xmlpull}.jar"
              public="yes"
-             sourcepath="src"
-             destdir="doc/api"
+             sourcepath="${srcDir}"
+             destdir="${docsDir}"
              author="true"
              version="true"
              use="true"
@@ -28,45 +37,44 @@
 		    <include name="*/**" />
 		    <exclude name=".*" />
 		    <exclude name="classes/**" />
-		    <exclude name="tmpclasses/**" />
+		    <exclude name="${tmpDir}/**" />
 		    <exclude name="dist/kxml2-src-*.zip"/>
 		   </fileset>
-		</zip>    
-    
+		</zip>
     </target>
 
 
     <target name="build_jar">
 
-    	<delete dir="tmpclasses"/>
-    	<mkdir dir="tmpclasses"/>
+    	<delete dir="${tmpDir}"/>
+    	<mkdir dir="${tmpDir}"/>
 
-    	<unzip src="lib/xmlpull_1_1_3_1.jar" dest="tmpclasses" overwrite="true"/>
+    	<unzip src="${xmlpull}.jar" dest="${tmpDir}" overwrite="true"/>
     
     <!-- 	       debug="off" -->
     	
-    	<javac srcdir="src" verbose="true"
-    	       destdir="tmpclasses"
+    	<javac srcdir="${srcDir}" verbose="true"
+    	       destdir="${tmpDir}"
     	       optimize="true"
-    		   target="1.2"
-    		   source="1.2"
+    		   target="1.6"
+    		   source="1.6"
     	       debuglevel="none"/>
 	
         <mkdir dir="dist"/>
             
     	
 		<jar jarfile="dist/kxml2-${version}.jar" >
-			<fileset dir="tmpclasses">
+			<fileset dir="${tmpDir}">
 				<include name="**/*.class"/>
 				<include name="META-INF/**"/>
 			</fileset>
-			<fileset dir="src">
+			<fileset dir="${resourceDir}">
 				<include name="META-INF/**"/>
 			</fileset>			
 		</jar>
 
 		<jar jarfile="dist/kxml2-min-${version}.jar">
-			<fileset dir="tmpclasses">
+			<fileset dir="${tmpDir}">
 		<!--		<include name="META-INF/**"/>  -->
 				<include name="org/xmlpull/v1/XmlPullParser.class"/>
 				<include name="org/xmlpull/v1/XmlPullParserException.class"/>
@@ -74,12 +82,10 @@
 			</fileset>
 		</jar>
 
-    	<delete dir="tmpclasses"/>
+    	<delete dir="${tmpDir}"/>
 	</target>
 
 
     <target name="build" depends="build_src" />
 
-	
-    
 </project>
